@@ -8,31 +8,25 @@ import re
 from tensorflow.keras.preprocessing.text import Tokenizer
 from gensim.models import Word2Vec
 
-# Download necessary NLTK resources
 nltk.download('stopwords')
 nltk.download('wordnet')
 
-# Preprocessing function
 def preprocess_text(text):
     lemma = nltk.WordNetLemmatizer()
-    text = re.sub(r'[^a-zA-Z\s]', ' ', text).lower()  # Remove non-alphabetic characters
+    text = re.sub(r'[^a-zA-Z\s]', ' ', text).lower()
     text = ' '.join([lemma.lemmatize(word) for word in text.split() if word not in nltk.corpus.stopwords.words('english')])
     return text
 
-# Load trained model and tokenizer
-model = load_model("disaster_rnn_model_optimized.h5")
-tokenizer = Tokenizer()  # Assuming you reinitialize the tokenizer with the training data
+model = load_model("disaster_keyword_model.h5")
+tokenizer = Tokenizer()
 word_index = tokenizer.word_index
 
-# App setup
 st.title("Disaster Classification App")
 st.write("This app classifies text as disaster-related or not disaster-related using an RNN-based model.")
 
-# Input text
 user_input = st.text_area("Enter the news or tweet text:")
 
-# Preprocess and predict
-max_len = 250  # Same max_len used in training
+max_len = 250
 
 def preprocess_input(news):
     words = preprocess_text(news).split()
@@ -46,7 +40,6 @@ def predict_news(news):
     sentiment = 'DisasterRelated' if prediction > 0.5 else 'Not Related'
     return sentiment, prediction
 
-# Display results
 if st.button("Predict"):
     if user_input:
         result, score = predict_news(user_input)
@@ -54,4 +47,3 @@ if st.button("Predict"):
         st.write(f"**Confidence Score:** {score:.2f}")
     else:
         st.write("Please enter some text to predict.")
-
